@@ -6,24 +6,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
-    "next": "latest",
+    "lucide-react": "latest",
+    "next": "^16.0.10",
     "react": "latest",
     "react-dom": "latest",
-    "xlsx": "latest",
-    "lucide-react": "latest"
+    "xlsx": "latest"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "autoprefixer": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
-    "typescript": "latest",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "postcss": "latest",
     "tailwindcss": "latest",
-    "autoprefixer": "latest",
-    "postcss": "latest"
+    "ts-jest": "^29.4.6",
+    "typescript": "latest"
   }
 }
