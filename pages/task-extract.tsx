@@ -232,11 +232,7 @@ const TaskExtractor = () => {
               </div>
 
               {filteredData.map((task, index) => (
-                <div
-                  key={`${task.worksheet}-${task.taskNumber}-${index}`}
-                  onClick={() => setPreviewTask(task)}
-                  className="cursor-pointer"
-                >
+                <div key={`${task.worksheet}-${task.taskNumber}-${index}`}>
                   <TaskDetail
                     task={task}
                     expandedMeasurementPoints={expandedMeasurementPoints}
