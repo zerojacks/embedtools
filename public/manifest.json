@@ -1,0 +1,22 @@
+{
+  "name": "EmbedTools - 嵌入式开发工具集",
+  "short_name": "EmbedTools",
+  "description": "专为嵌入式开发工程师打造的在线工具平台",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-simple.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    }
+  ]
+}
