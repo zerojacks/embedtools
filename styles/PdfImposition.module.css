@@ -1,0 +1,638 @@
+
+.container {
+  --primary: #007AFF;
+  --text: #000;
+  --text-sec: #555;
+  
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  /* Dark abstract gradient for liquid glass effect */
+  background: radial-gradient(circle at 50% 50%, #2b3242 0%, #0f1219 100%);
+  background-size: cover;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  overflow: hidden;
+  color: black;
+}
+
+.liquidGlassWrapper {
+  position: relative;
+  display: flex;
+  font-weight: 600;
+  color: black;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+  border-radius: 1.8rem;
+}
+
+.liquidGlassEffect {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  backdrop-filter: blur(3px);
+  /* filter: url(#glass-distortion); Note: ID references in CSS modules can be tricky if the ID is not global */
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 1.8rem;
+}
+
+.liquidGlassTint {
+  z-index: 1;
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 1.8rem;
+}
+
+.liquidGlassShine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 1.8rem;
+  box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.liquidGlassText {
+  z-index: 3;
+  position: relative; /* Ensure content stacks above effects */
+  color: black;
+  width: 100%;
+  height: 100%;
+}
+
+/* Layout Specifics */
+
+.appLayout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 32px;
+  gap: 32px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 340px;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+/* Inner sidebar content */
+.sidebarContent {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.subtitle {
+  font-size: 14px;
+  color: var(--text-sec);
+  font-weight: 500;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Inputs */
+.liquidGlassWrapper input[type="number"], 
+.liquidGlassWrapper input[type="text"] {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+  color: var(--text);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.inputGlassWrapper {
+  width: 100%;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.inputGlassWrapper .liquidGlassEffect,
+.inputGlassWrapper .liquidGlassTint,
+.inputGlassWrapper .liquidGlassShine {
+  border-radius: 10px;
+}
+
+.inputGlassWrapper .liquidGlassText {
+  display: flex;
+  align-items: center;
+}
+
+.container input[type=number], .container input[type=text] {
+  width: 100%;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.25);
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+  color: var(--text);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s;
+}
+.container input[type=number]:focus, .container input[type=text]:focus {
+  background: rgba(255,255,255,0.5);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
+}
+
+/* Custom File Upload */
+.fileUploadWrapper {
+  width: 100%;
+  min-height: 44px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+.fileUploadWrapper:hover {
+  transform: scale(1.02);
+}
+.globalDragOverlay {
+  position: fixed;
+  inset: 20px; /* Leave a small gap to look like a floating glass pane */
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  transform: scale(0.95);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.2);
+}
+
+.globalDragOverlay.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: scale(1);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.3), inset 0 0 60px rgba(0, 122, 255, 0.1);
+  border-color: rgba(0, 122, 255, 0.5);
+}
+
+.dragContent {
+  text-align: center;
+  color: #333;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.dragIcon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  color: var(--primary);
+  filter: drop-shadow(0 4px 6px rgba(0,122,255,0.3));
+}
+
+.dragTitle {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.dragSubtitle {
+  font-size: 16px;
+  color: #666;
+}
+.fileUploadContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+.fileInputHidden {
+  display: none;
+}
+
+/* Color Picker Wrapper */
+.colorPickerWrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.colorPickerContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container input[type=color] {
+  -webkit-appearance: none;
+  border: none;
+  width: 150%; 
+  height: 150%;
+  background: transparent;
+  padding: 0;
+  margin: -25%; 
+  cursor: pointer;
+}
+
+/* Custom Checkbox Glass */
+.checkboxGlass {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.checkboxGlass .liquidGlassEffect,
+.checkboxGlass .liquidGlassTint,
+.checkboxGlass .liquidGlassShine {
+  border-radius: 8px;
+}
+.checkboxInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.checkmark {
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  transform: scale(0.8);
+}
+.checkboxGlass.checked .checkmark {
+  opacity: 1;
+  transform: scale(1);
+}
+.checkboxGlass.checked .liquidGlassTint {
+  background: rgba(0, 122, 255, 0.3); 
+}
+
+/* Slider */
+.container input[type=range] {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+  appearance: none;
+  outline: none;
+  margin: 10px 0;
+  backdrop-filter: blur(4px);
+}
+.container input[type=range]::-webkit-slider-thumb {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: transform 0.1s;
+}
+.container input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+/* Main Area */
+.mainArea {
+  flex: 1;
+}
+
+.mainAreaContent {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  border-radius: 1.8rem;
+}
+
+.previewControls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  width: 200px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.previewContainer {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+  padding: 20px;
+  position: relative;
+}
+
+.previewList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  padding-bottom: 40px;
+}
+
+.canvasWrapper {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  background: white;
+  transition: transform 0.3s ease;
+  margin-bottom: 10px;
+}
+.canvasWrapper:hover {
+  transform: scale(1.02);
+}
+
+.pageNumber {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #a3a3a3;
+  text-align: center;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button */
+.btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+}
+.btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0,122,255,0.4);
+}
+.btn:disabled {
+  background: rgba(0,0,0,0.2);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: rgba(255,255,255,0.5);
+}
+
+.actionsFooter {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.previewProgressOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 1.8rem;
+}
+
+.progressCard {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5);
+  width: 300px;
+  text-align: center;
+}
+
+.progressTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 8px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progressText {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Custom Select Styles - Adapted for React */
+/* We will likely replace the custom JS select with a React component or standard select for simplicity first, or re-implement the UI */
+.customSelectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.customSelectTrigger {
+  width: 100%;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.25);
+  padding: 0 12px;
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s;
+}
+
+.customSelectTrigger:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+.customSelectTrigger::after {
+  content: '';
+  width: 0; 
+  height: 0; 
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #555;
+  opacity: 0.7;
+}
+
+.customSelectOptions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  z-index: 100;
+  border-radius: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.customSelectOptions.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.optionsContent {
+  padding: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.customOption {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.customOption:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.customOption.selected {
+  background: var(--primary);
+  color: white;
+}
+
+/* Global Scrollbar Styling */
+:global(::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+}
+
+:global(::-webkit-scrollbar-track) {
+  background: transparent;
+}
+
+:global(::-webkit-scrollbar-thumb) {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+:global(::-webkit-scrollbar-thumb:hover) {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+:global(::-webkit-scrollbar-corner) {
+  background: transparent;
+}
+
+/* For Firefox and Box Sizing */
+:global(*) {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}

@@ -13,6 +13,8 @@
   "dependencies": {
     "lucide-react": "latest",
     "next": "^16.0.10",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.4.530",
     "react": "latest",
     "react-dom": "latest",
     "xlsx": "latest"

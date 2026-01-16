@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Github,
   Mail,
-  Globe
+  Globe,
+  Layers
 } from 'lucide-react';
 import { EmbedToolsSVGLogo } from '@/components/Logo';
 
@@ -90,6 +91,14 @@ export default function Home() {
       href: '/task-extract',
       status: 'available' as const,
       gradient: 'bg-gradient-to-br from-blue-500 to-indigo-600'
+    },
+    {
+      icon: Layers,
+      title: 'PDF 拼版工具',
+      description: '专业的 PDF 拼版工具，支持多页拼版(N-Up)、裁剪、边距调整与实时预览，本地处理，安全高效。',
+      href: '/pdf-imposition',
+      status: 'available' as const,
+      gradient: 'bg-gradient-to-br from-red-500 to-rose-600'
     },
     {
       icon: Code,
