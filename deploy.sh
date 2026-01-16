@@ -13,12 +13,6 @@ BACKUP_PATH="/var/backups/embedtools.icu"
 SERVICE_NAME="embedtools-app"
 PORT=3000
 
-# 部署模式 (通过参数控制)
-BUILD_ONLY=false
-if [[ "$1" == "--build-only" || "$1" == "-b" ]]; then
-    BUILD_ONLY=true
-fi
-
 # 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -52,11 +46,7 @@ check_root() {
 
 # 检查必要的工具
 check_dependencies() {
-    if [ "$BUILD_ONLY" = true ]; then
-        log_info "检查构建所需的工具..."
-    else
-        log_info "检查必要的编译工具和依赖..."
-    fi
+    log_info "检查必要的编译工具和依赖..."
     
     local missing_tools=()
     
@@ -66,14 +56,8 @@ check_dependencies() {
     else
         local node_version=$(node --version | cut -d'v' -f2)
         local major_version=$(echo $node_version | cut -d'.' -f1)
-        local minor_version=$(echo $node_version | cut -d'.' -f2)
-        
-        # Next.js需要Node.js >= 20.9.0
-        if [ "$major_version" -lt 20 ] || ([ "$major_version" -eq 20 ] && [ "$minor_version" -lt 9 ]); then
-            log_error "Node.js版本过低 ($node_version)，Next.js需要 >= 20.9.0"
-            log_info "请运行以下命令升级Node.js："
-            log_info "  chmod +x upgrade-node.sh && ./upgrade-node.sh"
-            exit 1
+        if [ "$major_version" -lt 18 ]; then
+            log_warning "Node.js版本过低 ($node_version)，建议使用18+版本"
         else
             log_success "Node.js版本: $node_version ✓"
         fi
@@ -86,29 +70,26 @@ check_dependencies() {
         log_success "npm版本: $(npm --version) ✓"
     fi
     
-    # 仅在完整部署模式下检查其他工具
-    if [ "$BUILD_ONLY" = false ]; then
-        # 检查git
-        if ! command -v git &> /dev/null; then
-            missing_tools+=("git")
-        else
-            log_success "git版本: $(git --version) ✓"
-        fi
-        
-        # 检查nginx
-        if ! command -v nginx &> /dev/null; then
-            missing_tools+=("nginx")
-        else
-            log_success "nginx版本: $(nginx -v 2>&1) ✓"
-        fi
-        
-        # 检查pm2
-        if ! command -v pm2 &> /dev/null; then
-            log_warning "PM2未安装，将使用npm全局安装"
-            npm install -g pm2
-        else
-            log_success "PM2版本: $(pm2 --version) ✓"
-        fi
+    # 检查git
+    if ! command -v git &> /dev/null; then
+        missing_tools+=("git")
+    else
+        log_success "git版本: $(git --version) ✓"
+    fi
+    
+    # 检查nginx
+    if ! command -v nginx &> /dev/null; then
+        missing_tools+=("nginx")
+    else
+        log_success "nginx版本: $(nginx -v 2>&1) ✓"
+    fi
+    
+    # 检查pm2
+    if ! command -v pm2 &> /dev/null; then
+        log_warning "PM2未安装，将使用npm全局安装"
+        npm install -g pm2
+    else
+        log_success "PM2版本: $(pm2 --version) ✓"
     fi
     
     if [ ${#missing_tools[@]} -ne 0 ]; then
@@ -304,26 +285,16 @@ EOF
     sudo mkdir -p /var/log/pm2
     sudo chown -R www-data:www-data /var/log/pm2
     
-    # 检查服务是否已存在
-    if pm2 list | grep -q "$SERVICE_NAME"; then
-        log_info "检测到已存在的PM2服务 '$SERVICE_NAME'，正在重启..."
-        cd "$DEPLOY_PATH"
-        pm2 reload "$SERVICE_NAME" --update-env
-        log_success "PM2服务已重新加载"
-    else
-        log_info "启动新的PM2服务..."
-        cd "$DEPLOY_PATH"
-        pm2 start ecosystem.config.js
-        log_success "PM2服务已启动"
-    fi
+    # 停止旧的应用（如果存在）
+    pm2 delete "$SERVICE_NAME" 2>/dev/null || true
     
-    # 保存PM2配置
+    # 启动新应用
+    cd "$DEPLOY_PATH"
+    pm2 start ecosystem.config.js
     pm2 save
     
-    # 设置PM2开机自启（仅在首次部署时）
-    if ! pm2 startup | grep -q "already setup"; then
-        pm2 startup systemd -u www-data --hp /var/www
-    fi
+    # 设置PM2开机自启
+    pm2 startup systemd -u www-data --hp /var/www
     
     log_success "PM2应用配置完成"
 }
@@ -356,24 +327,6 @@ health_check() {
     pm2 status
 }
 
-# 显示构建完成信息
-show_build_info() {
-    log_success "构建和文件部署完成！"
-    echo
-    echo "==================================="
-    echo "  构建完成信息"
-    echo "==================================="
-    echo "部署路径: $DEPLOY_PATH"
-    echo "构建文件: .next/"
-    echo "依赖文件: node_modules/"
-    echo
-    echo "后续操作："
-    echo "  完整部署: ./deploy.sh"
-    echo "  手动重启PM2: pm2 reload $SERVICE_NAME"
-    echo "  查看应用状态: pm2 status"
-    echo "==================================="
-}
-
 # 显示部署信息
 show_deployment_info() {
     log_success "部署完成！"
@@ -402,30 +355,19 @@ show_deployment_info() {
 
 # 主函数
 main() {
-    if [ "$BUILD_ONLY" = true ]; then
-        log_info "开始构建和部署文件到 $DOMAIN (仅构建模式)"
-        
-        check_dependencies
-        build_project
-        deploy_files
-        show_build_info
-        
-        log_success "构建和文件部署完成！"
-    else
-        log_info "开始完整部署Excel任务提取工具到 $DOMAIN"
-        
-        check_root
-        check_dependencies
-        create_backup
-        build_project
-        deploy_files
-        configure_nginx
-        configure_pm2
-        health_check
-        show_deployment_info
-        
-        log_success "部署流程全部完成！"
-    fi
+    log_info "开始部署Excel任务提取工具到 $DOMAIN"
+    
+    check_root
+    check_dependencies
+    create_backup
+    build_project
+    deploy_files
+    configure_nginx
+    configure_pm2
+    health_check
+    show_deployment_info
+    
+    log_success "部署流程全部完成！"
 }
 
 # 执行主函数
