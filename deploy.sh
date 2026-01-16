@@ -265,8 +265,8 @@ module.exports = {
     script: 'npm',
     args: 'start',
     cwd: '$DEPLOY_PATH',
-    instances: 'max',
-    exec_mode: 'cluster',
+    instances: 1, // 暂时使用1个实例
+    exec_mode: 'fork', // 使用 fork 模式
     env: {
       NODE_ENV: 'production',
       PORT: $PORT
@@ -285,12 +285,25 @@ EOF
     sudo mkdir -p /var/log/pm2
     sudo chown -R www-data:www-data /var/log/pm2
     
-    # 停止旧的应用（如果存在）
-    pm2 delete "$SERVICE_NAME" 2>/dev/null || true
-    
-    # 启动新应用
+    # 切换到部署目录
     cd "$DEPLOY_PATH"
-    pm2 start ecosystem.config.js
+
+    # 获取运行实例数量
+    # 使用 pm2 jlist 获取 JSON 列表并统计名称出现次数，以处理 Cluster 模式遗留的多实例问题
+    local instance_count=$(pm2 jlist | grep -o "\"name\":\"$SERVICE_NAME\"" | wc -l)
+
+    if [ "$instance_count" -gt 1 ]; then
+        log_warning "检测到多个 $SERVICE_NAME 实例(数量: $instance_count)，正在清理并重新启动以确保单实例模式..."
+        pm2 delete "$SERVICE_NAME" 2>/dev/null || true
+        pm2 start ecosystem.config.js
+    elif [ "$instance_count" -eq 1 ]; then
+        log_info "应用 $SERVICE_NAME 已存在，正在重启..."
+        pm2 reload "$SERVICE_NAME" --update-env
+    else
+        log_info "应用 $SERVICE_NAME 不存在，正在启动..."
+        pm2 start ecosystem.config.js
+    fi
+    
     pm2 save
     
     # 设置PM2开机自启
